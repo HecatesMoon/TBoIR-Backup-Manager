@@ -1,5 +1,6 @@
 *.class
 .vscode/
-Backups/
+Isaac-Backups/
 logs.txt
 todo.txt
+config.properties
