@@ -1,6 +1,5 @@
 package com.isaac.service;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,10 +19,12 @@ public class SaveManager {
                                              .toString()
                                              .contains("persistentgamedata"))
                                              .forEach(file -> copyFile(file, Config.getBackupPath()));
-            } catch (IOException e) {
+            } 
+            catch (IOException e) {
                 System.err.println("Failed trying to access folder: " + e.getMessage());
             }
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
             System.err.println("Failed trying to create the backup folder: " + e.getMessage());
         }
     }
