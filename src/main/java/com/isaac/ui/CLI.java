@@ -1,0 +1,58 @@
+package com.isaac.ui;
+
+import java.util.Scanner;
+
+import com.isaac.Config;
+import com.isaac.service.RestoreManager;
+import com.isaac.service.SaveManager;
+
+public class CLI {
+
+    private Boolean isRunning;
+    private Scanner scanner;
+
+    public CLI (){
+        this.isRunning = true;
+        this.scanner = new Scanner(System.in);
+    }
+
+    public void cliLoop(){
+        
+        String choosenOption;
+
+        System.out.println("Welcome to TBoIR Backup");
+        System.out.println("----------MENU----------");
+        System.out.println("1. Show current configured paths");
+        System.out.println("2. Backup the savefiles (from source to backup folder)");
+        System.out.println("3. Restore the savefiles (from backup to source folder)");
+        System.out.println("4. Exit");
+        System.out.println("What do you want to do? (press the number and then enter)");
+        System.out.println(">");
+        
+        while (this.isRunning) {
+            choosenOption = this.scanner.nextLine();
+            switch (choosenOption) {
+                case "1":
+                    System.out.println("Source Path: " + Config.getOriginPath().toString());
+                    System.out.println("Backup Path: " + Config.getBackupPath().toString());
+                    break;
+                case "2":
+                    SaveManager.backup();
+                    System.out.println("Backup Done!");
+                    break;
+                case "3":
+                    RestoreManager.restore();
+                    System.out.println("Savefiles restored from backup!");
+                    break;
+                case "4":
+                    System.out.println("Closing program");
+                    isRunning = false;
+                    break;
+                default:
+                    System.out.println("Write a valid number");
+                    break;
+            }
+        }
+        scanner.close();
+    };
+}
