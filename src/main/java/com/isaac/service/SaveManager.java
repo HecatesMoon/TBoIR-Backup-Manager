@@ -13,13 +13,13 @@ public class SaveManager {
     public static void backup(){
         try {
             
-            Files.createDirectories(Config.BACKUP_PATH);
+            Files.createDirectories(Config.getBackupPath());
 
-            try (Stream<Path> saveFiles = Files.walk(Config.ORIGIN_PATH, 1)) {
+            try (Stream<Path> saveFiles = Files.walk(Config.getOriginPath(), 1)) {
                 saveFiles.filter(file -> file.getFileName()
                                              .toString()
                                              .contains("persistentgamedata"))
-                                             .forEach(file -> copyFile(file, Config.BACKUP_PATH));
+                                             .forEach(file -> copyFile(file, Config.getBackupPath()));
             } catch (IOException e) {
                 System.err.println("Failed trying to access folder: " + e.getMessage());
             }
