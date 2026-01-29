@@ -18,41 +18,52 @@ public class CLI {
 
     public void cliLoop(){
         
-        String choosenOption;
 
         System.out.println("Welcome to TBoIR Backup");
+        
+        while (this.isRunning) {
+
+            printMenu();
+            menuOption();
+            
+        }
+        scanner.close();
+    };
+
+    private void printMenu(){
         System.out.println("----------MENU----------");
         System.out.println("1. Show current configured paths");
         System.out.println("2. Backup the savefiles (from source to backup folder)");
         System.out.println("3. Restore the savefiles (from backup to source folder)");
         System.out.println("4. Exit");
         System.out.println("What do you want to do? (press the number and then enter)");
-        System.out.println(">");
-        
-        while (this.isRunning) {
-            choosenOption = this.scanner.nextLine();
-            switch (choosenOption) {
-                case "1":
-                    System.out.println("Source Path: " + Config.getOriginPath().toString());
-                    System.out.println("Backup Path: " + Config.getBackupPath().toString());
-                    break;
-                case "2":
-                    SaveManager.backup();
-                    System.out.println("Backup Done!");
-                    break;
-                case "3":
-                    RestoreManager.restore();
-                    System.out.println("Savefiles restored from backup!");
-                    break;
-                case "4":
-                    System.out.println("Closing program");
-                    isRunning = false;
-                    break;
-                default:
-                    System.out.println("Write a valid number");
-                    break;
-            }
+        System.out.print("> ");
+    }
+
+    private void menuOption(){
+        String choosenOption;
+        choosenOption = this.scanner.nextLine();
+
+        switch (choosenOption) {
+            case "1":
+                System.out.println("Source Path: " + Config.getOriginPath().toString());
+                System.out.println("Backup Path: " + Config.getBackupPath().toString());
+                break;
+            case "2":
+                SaveManager.backup();
+                System.out.println("Backup Done!");
+                break;
+            case "3":
+                RestoreManager.restore();
+                System.out.println("Savefiles restored from backup!");
+                break;
+            case "4":
+                System.out.println("Closing program");
+                isRunning = false;
+                break;
+            default:
+                System.out.println("Write a valid number");
+                break;
         }
-        scanner.close();
-    };
+    }
 }
