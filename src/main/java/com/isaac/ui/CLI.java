@@ -49,12 +49,19 @@ public class CLI {
                 System.out.println("Backup Path: " + Config.getBackupPath().toString());
                 break;
             case "2":
-                SaveManager.backup();
-                System.out.println("Backup Done!");
+                if (SaveManager.backup()){
+                    System.out.println("Backup Done!");
+                } else {
+                    System.err.println("Backup failed!");
+                }
+                
                 break;
             case "3":
-                RestoreManager.restore();
-                System.out.println("Savefiles restored from backup!");
+                if (RestoreManager.restore()){
+                    System.out.println("Savefiles restored from backup!");
+                } else {
+                    System.err.println("Restoring failed");
+                }
                 break;
             case "4":
                 System.out.println("Closing program");
