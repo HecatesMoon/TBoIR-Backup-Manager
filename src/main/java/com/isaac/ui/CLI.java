@@ -18,12 +18,12 @@ public class CLI {
 
     public void cliLoop(){
         
-
-        System.out.println("Welcome to TBoIR Backup");
+        System.out.println("Welcome to TBoIR Backup Maker");
+        printMenu();
         
         while (this.isRunning) {
-
-            printMenu();
+            
+            System.out.print("> ");
             menuOption();
             
         }
@@ -37,7 +37,6 @@ public class CLI {
         System.out.println("3. Restore the savefiles (from backup to source folder)");
         System.out.println("4. Exit");
         System.out.println("What do you want to do? (press the number and then enter)");
-        System.out.print("> ");
     }
 
     private void menuOption(){
