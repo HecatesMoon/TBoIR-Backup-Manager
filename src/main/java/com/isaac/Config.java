@@ -12,13 +12,13 @@ public class Config {
     private static Properties configs = new Properties();
     private static final Path CONFIG_FILE = Path.of("config.properties");
 
-    //todo: add os compatibilty
     private static final String USER_HOME = System.getProperty("user.home");
     private static final String BASE_DIR = System.getProperty("user.dir");
+    private static final String OS_NAME = System.getProperty("os.name");
 
-    private static final Path DEFAULT_ORIGIN_PATH = Path.of(USER_HOME, "Documents", "My Games", "Binding of Isaac Repentance+");
+    private static final Path DEFAULT_ORIGIN_PATH = defaultOriginPath();
     private static final Path DEFAULT_BACKUP_PATH = Path.of(BASE_DIR, "Isaac-Backups");
-
+    
     private static Path ORIGIN_PATH;
     private static Path BACKUP_PATH;
 
@@ -26,6 +26,7 @@ public class Config {
         init();
     }
 
+    //method that setups a fis and loads the properties from a config file
     private static void loadProperties (){
         try (FileInputStream fis = new FileInputStream(CONFIG_FILE.toFile())){
             configs.load(fis);
@@ -33,6 +34,7 @@ public class Config {
             System.err.println("Failed trying to read config.properties: " + e.getMessage());
         }
     }
+    //method that setups a fos and saves the properties in a config file
     private static void storeProperties(){
         try (FileOutputStream fos = new FileOutputStream(CONFIG_FILE.toFile())) {
             configs.store(fos, "Basic paths configs for Isaac Backup");
@@ -41,6 +43,7 @@ public class Config {
         }
     }
 
+    //Uses a init method to read the config file and have access to the setted paths, if there is no file, it uses default paths and creates a file
     private static void init(){
 
         if (!Files.exists(CONFIG_FILE)){
@@ -55,6 +58,26 @@ public class Config {
         ORIGIN_PATH = Path.of(configs.getProperty("ORIGIN_PATH", DEFAULT_ORIGIN_PATH.toString()));
         BACKUP_PATH = Path.of(configs.getProperty("BACKUP_PATH", DEFAULT_BACKUP_PATH.toString()));
     
+    }
+
+    //Initialize default paths depending on the used OS
+    private static Path defaultOriginPath(){
+        String os = OS_NAME.toLowerCase();
+
+        if (os.contains("win")){
+            return Path.of(USER_HOME, "Documents", "My Games", "Binding of Isaac Repentance+");
+        } else if (os.contains("mac")){
+            return Path.of(USER_HOME, "Library", "Application Support", "Binding of Isaac Rebirth");
+        }else if (os.contains("linux")){
+            String linuxHome = System.getenv("XDG_DATA_HOME");
+            if (linuxHome != null){
+                return Path.of(linuxHome, "Steam", "steamapps", "compatdata", "250900", "pfx", "drive_c", "users", "steamuser", "Documents", "My Games", "Binding of Isaac Repentance");
+            } else {
+                return Path.of(USER_HOME, ".local","share", "Steam", "steamapps", "compatdata", "250900", "pfx", "drive_c", "users", "steamuser", "Documents", "My Games", "Binding of Isaac Repentance");
+            }
+        } 
+
+        throw new UnsupportedOperationException("Unsupported Operative System " + OS_NAME);
     }
 
     public static Path getOriginPath() {
