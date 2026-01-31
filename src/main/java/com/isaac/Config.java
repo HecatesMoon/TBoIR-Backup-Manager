@@ -99,8 +99,8 @@ public class Config {
         Path newPath = Path.of(newBackupPath);
 
         if (newPath.toFile().isDirectory() && Files.isWritable(newPath)){
-            ORIGIN_PATH = newPath;
-            configs.setProperty("ORIGIN_PATH", newBackupPath);
+            BACKUP_PATH = newPath;
+            configs.setProperty("BACKUP_PATH", newBackupPath);
             storeProperties();
             return true;
         } else {
