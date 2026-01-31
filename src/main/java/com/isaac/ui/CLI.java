@@ -8,10 +8,10 @@ import com.isaac.service.SaveManager;
 
 public class CLI {
 
-    private Boolean cliLoopRuns;
+    private boolean cliLoopRuns;
     private Scanner scanner;
     
-    private Boolean pathChangeLoop;
+    private boolean pathChangeLoop;
 
     public CLI (){
         this.cliLoopRuns = true;
@@ -20,14 +20,19 @@ public class CLI {
 
     public void cliLoop(){
         
-        System.out.println("Welcome to TBoIR Backup Maker");
-        printMenu("main");
+        clearConsole();
         
         while (this.cliLoopRuns) {
-            
+            System.out.println("Welcome to TBoIR Backup Maker");
+            printMenu("main"); 
+
             System.out.print("> ");
-            menuOption(this.scanner.nextLine());
+            menuOption(this.scanner.nextLine().trim());
             
+            if (cliLoopRuns){
+                waitForEnter();
+                clearConsole();
+            }
         }
         scanner.close();
     };
@@ -48,6 +53,7 @@ public class CLI {
                 System.out.println("1. Change Origin Path");
                 System.out.println("2. Change Backup Path");
                 System.out.println("3. Exit Path Configuration");
+                System.out.println("What do you want to do? (press the number and then enter)");
                 break;
             default:
                 System.out.println("Write a valid number");
@@ -91,17 +97,23 @@ public class CLI {
     }
 
     private void changePathLoop(){
-
+        clearConsole();
         pathChangeLoop = true;
 
-        System.out.println("------CHANGE PATHS------");
-        System.out.println("Origin Path:" + Config.getOriginPath());
-        System.out.println("Backup Path:" + Config.getBackupPath());
-        printMenu("paths");
-
         while(pathChangeLoop){
+
+            System.out.println("------CHANGE PATHS------");
+            System.out.println("Origin Path:" + Config.getOriginPath());
+            System.out.println("Backup Path:" + Config.getBackupPath());
+            printMenu("paths");
+
             System.out.print("> ");
-            changePath(this.scanner.nextLine());
+            changePath(this.scanner.nextLine().trim());
+
+            if (pathChangeLoop){
+                waitForEnter();
+                clearConsole();
+            }
         }
     }
 
@@ -111,7 +123,7 @@ public class CLI {
             case "1":// changes origin path
                 System.out.println("Input the path you want to use for origin");
                 System.out.print(">");
-                if (Config.setOriginPath(this.scanner.nextLine())){
+                if (Config.setOriginPath(this.scanner.nextLine().trim())){
                     System.out.println("The origin path was changed succesfully");
                     System.out.println(Config.getOriginPath());
                 } else {
@@ -121,7 +133,7 @@ public class CLI {
             case "2":// changes backup path
                 System.out.println("Input the path you want to use for backup");
                 System.out.print(">");
-                if (Config.setBackupPath(this.scanner.nextLine())){
+                if (Config.setBackupPath(this.scanner.nextLine().trim())){
                     System.out.println("The backup path was changed succesfully");
                     System.out.println(Config.getBackupPath());
                 } else {
@@ -136,6 +148,24 @@ public class CLI {
                 System.out.println("Write a valid number");
                 break;
         }
+
+    }
+
+    private void clearConsole(){
+        try{
+            if (Config.isWindows){
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                new ProcessBuilder("clear").inheritIO().start().waitFor();
+            }
+        } catch(Exception e) {
+            for (int i = 0; i < 50;i++) System.out.println();
+        } 
+    }
+
+    private void waitForEnter(){
+        System.out.println("Press enter to continue...");
+        this.scanner.nextLine();
     }
 
 }
