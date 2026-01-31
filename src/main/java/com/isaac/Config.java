@@ -80,21 +80,39 @@ public class Config {
         throw new UnsupportedOperationException("Unsupported Operative System " + OS_NAME);
     }
 
+
+    public static boolean setOriginPath(String newOriginPath) {
+
+        Path newPath = Path.of(newOriginPath);
+
+        if (newPath.toFile().isDirectory() && Files.isWritable(newPath)){
+            ORIGIN_PATH = newPath;
+            configs.setProperty("ORIGIN_PATH", newOriginPath);
+            storeProperties();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean setBackupPath(String newBackupPath) {
+        Path newPath = Path.of(newBackupPath);
+
+        if (newPath.toFile().isDirectory() && Files.isWritable(newPath)){
+            ORIGIN_PATH = newPath;
+            configs.setProperty("ORIGIN_PATH", newBackupPath);
+            storeProperties();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public static Path getOriginPath() {
         return ORIGIN_PATH;
     }
-    public static void setOriginPath(Path oRIGIN_PATH) {
-        ORIGIN_PATH = oRIGIN_PATH;
-        configs.setProperty("ORIGIN_PATH", oRIGIN_PATH.toString());
-        storeProperties();
-    }
     public static Path getBackupPath() {
         return BACKUP_PATH;
-    }
-    public static void setBackupPath(Path bACKUP_PATH) {
-        BACKUP_PATH = bACKUP_PATH;
-        configs.setProperty("BACKUP_PATH", bACKUP_PATH.toString());
-        storeProperties();
     }
 
     
