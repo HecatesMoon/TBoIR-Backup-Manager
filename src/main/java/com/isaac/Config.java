@@ -16,6 +16,10 @@ public class Config {
     private static final String BASE_DIR = System.getProperty("user.dir");
     private static final String OS_NAME = System.getProperty("os.name");
 
+    public static final boolean isWindows = OS_NAME.toLowerCase().contains("win");
+    public static final boolean isLinux = OS_NAME.toLowerCase().contains("linux");
+    public static final boolean isMac = OS_NAME.toLowerCase().contains("mac");
+
     private static final Path DEFAULT_ORIGIN_PATH = defaultOriginPath();
     private static final Path DEFAULT_BACKUP_PATH = Path.of(BASE_DIR, "Isaac-Backups");
     
@@ -62,13 +66,12 @@ public class Config {
 
     //Initialize default paths depending on the used OS
     private static Path defaultOriginPath(){
-        String os = OS_NAME.toLowerCase();
 
-        if (os.contains("win")){
+        if (isWindows){
             return Path.of(USER_HOME, "Documents", "My Games", "Binding of Isaac Repentance+");
-        } else if (os.contains("mac")){
+        } else if (isMac){
             return Path.of(USER_HOME, "Library", "Application Support", "Binding of Isaac Rebirth");
-        }else if (os.contains("linux")){
+        }else if (isLinux){
             String linuxHome = System.getenv("XDG_DATA_HOME");
             if (linuxHome != null){
                 return Path.of(linuxHome, "Steam", "steamapps", "compatdata", "250900", "pfx", "drive_c", "users", "steamuser", "Documents", "My Games", "Binding of Isaac Repentance");
