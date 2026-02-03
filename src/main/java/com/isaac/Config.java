@@ -74,15 +74,15 @@ public class Config {
     private static Path defaultOriginPath(){
 
         if (isWindows){
-            return Path.of(USER_HOME, "Documents", "My Games", "Binding of Isaac Repentance+");
+            return Path.of(USER_HOME, "Documents", "My Games");
         } else if (isMac){
-            return Path.of(USER_HOME, "Library", "Application Support", "Binding of Isaac Rebirth");
+            return Path.of(USER_HOME, "Library", "Application Support");
         }else if (isLinux){
             String linuxHome = System.getenv("XDG_DATA_HOME");
             if (linuxHome != null){
-                return Path.of(linuxHome, "Steam", "steamapps", "compatdata", "250900", "pfx", "drive_c", "users", "steamuser", "Documents", "My Games", "Binding of Isaac Repentance");
+                return Path.of(linuxHome, "Steam", "steamapps", "compatdata", "250900", "pfx", "drive_c", "users", "steamuser", "Documents", "My Games");
             } else {
-                return Path.of(USER_HOME, ".local","share", "Steam", "steamapps", "compatdata", "250900", "pfx", "drive_c", "users", "steamuser", "Documents", "My Games", "Binding of Isaac Repentance");
+                return Path.of(USER_HOME, ".local","share", "Steam", "steamapps", "compatdata", "250900", "pfx", "drive_c", "users", "steamuser", "Documents", "My Games");
             }
         } 
 
