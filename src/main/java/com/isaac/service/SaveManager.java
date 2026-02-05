@@ -18,12 +18,7 @@ public class SaveManager {
 
     public boolean backup(GameVersion version){
 
-        Path finalOriginPath;
-        if ((version == GameVersion.REPENTANCE || version == GameVersion.REPENTANCE_PLUS) && Config.isLinux){
-            finalOriginPath = config.getOriginPath().resolve(config.getProtonPath().resolve(version.getFolderName()));
-        } else {
-            finalOriginPath = config.getOriginPath().resolve(version.getFolderName());
-        }
+        Path finalOriginPath = config.getOriginPath().resolve(config.ProtonUsageCheck(version));
 
         Path finalBackupPath = config.getBackupPath().resolve(version.getFolderName());
 

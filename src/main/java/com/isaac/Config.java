@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
 
+import com.isaac.service.GameVersion;
+
 public class Config {
 
     private final Properties configs = new Properties();
@@ -122,9 +124,15 @@ public class Config {
     public Path getBackupPath() {
         return BACKUP_PATH;
     }
-
-    public Path getProtonPath(){
-        return Path.of("Steam", "steamapps", "compatdata", "250900", "pfx", "drive_c", "users", "steamuser", "Documents", "My Games");
+    //it checks if it needs to add to the path the proton prefix
+    public Path ProtonUsageCheck(GameVersion version){
+        Path protonPrefix = Path.of("Steam", "steamapps", "compatdata", "250900", "pfx", "drive_c", "users", "steamuser", "Documents", "My Games");
+        Path gameFolder = version.getFolderName();
+        if ((version == GameVersion.REPENTANCE || version == GameVersion.REPENTANCE_PLUS) && Config.isLinux){
+            return protonPrefix.resolve(gameFolder);
+        } else {
+            return gameFolder;
+        }
     }
 
     
