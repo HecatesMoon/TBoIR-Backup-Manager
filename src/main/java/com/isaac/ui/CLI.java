@@ -103,6 +103,7 @@ public class CLI {
 
         if (optionChoosenInt > 2 && optionChoosenInt <= versions.length+2){
                 executeOperation(versions[optionChoosenInt-3], operation, action);
+                pickGameVersionRuns = false;
         }
 
         switch (optionChoosen) {
