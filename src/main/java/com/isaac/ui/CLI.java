@@ -5,6 +5,7 @@ import java.util.function.Predicate;
 
 import com.isaac.Config;
 import com.isaac.service.GameVersion;
+import com.isaac.service.IOUtils;
 import com.isaac.service.RestoreManager;
 import com.isaac.service.SaveManager;
 
@@ -46,21 +47,30 @@ public class CLI {
 
     private void menuOption(String choosenOption){
 
-        switch (choosenOption) {
-            case "1": //prints actual paths
+        Integer choosenOptionInt;
+
+        try {
+            choosenOptionInt = IOUtils.checkNumberInput(choosenOption);
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid input, number is out of limits: " + e.getMessage());
+            choosenOptionInt = -1;
+        }
+
+        switch (choosenOptionInt) {
+            case 1: //prints actual paths
                 System.out.println("Source Path: " + config.getOriginPath().toString());
                 System.out.println("Backup Path: " + config.getBackupPath().toString());
                 break;
-            case "2": // backups data
+            case 2: // backups data
                 pickGameVersionLoop("backup");
                 break;
-            case "3": // restores backup
+            case 3: // restores backup
                 pickGameVersionLoop("restore");
                 break;
-            case "4": // opens path configuration
+            case 4: // opens path configuration
                 pathChangeLoop();
                 break;
-            case "5": // exits program
+            case 5: // exits program
                 System.out.println("Closing program");
                 cliLoopRuns = false;
                 break;
@@ -92,25 +102,29 @@ public class CLI {
 
     private void gameVersionOptions (String optionChoosen, String action){
         
-        int optionChoosenInt = 0;
+        int optionChoosenInt;
+
+        try {
+            optionChoosenInt = IOUtils.checkNumberInput(optionChoosen);
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid input, number is out of limits: " + e.getMessage());
+            optionChoosenInt = -1;
+        }
+
+
         GameVersion[] versions = GameVersion.values();
         Predicate<GameVersion> operation = (action.equals("backup")) ? saveManager::backup : restoreManager::restore;
-        
-        
-        if (optionChoosen.matches("\\d+")) {
-            optionChoosenInt = Integer.parseInt(optionChoosen);
-        } 
 
         if (optionChoosenInt > 2 && optionChoosenInt <= versions.length+2){
                 executeOperation(versions[optionChoosenInt-3], operation, action);
                 pickGameVersionRuns = false;
         }
 
-        switch (optionChoosen) {
-            case "1": //closes menu
+        switch (optionChoosenInt) {
+            case 1: //closes menu
                 pickGameVersionRuns = false;
                 break;
-            case "2": //all tboi ver //todo: make a way to know which version are installed, like checking for folders on start
+            case 2: //all tboi ver //todo: make a way to know which version are installed, like checking for folders on start
                 for (GameVersion v : versions){
                     executeOperation(v, operation, action);
                 }
@@ -146,6 +160,15 @@ public class CLI {
 
     private void changePath(String choosenOption){
             
+        Integer choosenOptionInt;
+
+        try {
+            choosenOptionInt = IOUtils.checkNumberInput(choosenOption);
+        } catch (NumberFormatException e) {
+            System.err.println("Invalid input, number is out of limits: " + e.getMessage());
+            choosenOptionInt = -1;
+        }
+
         System.out.println("The folder you choose has to contain the gamesave folder");
         System.out.println("eg: ../Documents/My Games/Binding of Isaac Rebirth/<your savefiles>");
         System.out.println("your path should be '../Documents/My games/'");
@@ -153,8 +176,8 @@ public class CLI {
         System.out.println("Input the path you want to use for origin");
         System.out.print(">");
 
-        switch (choosenOption) {
-            case "1":// changes origin path
+        switch (choosenOptionInt) {
+            case 1:// changes origin path
                 if (config.setOriginPath(this.scanner.nextLine().trim())){
                     System.out.println("The origin path was changed succesfully");
                     System.out.println(config.getOriginPath());
@@ -162,7 +185,7 @@ public class CLI {
                     System.out.println("The path couldn't be changed, the path does not exist or is not writeable");
                 }
                 break;
-            case "2":// changes backup path
+            case 2:// changes backup path
                 if (config.setBackupPath(this.scanner.nextLine().trim())){
                     System.out.println("The backup path was changed succesfully");
                     System.out.println(config.getBackupPath());
@@ -170,7 +193,7 @@ public class CLI {
                     System.out.println("The path couldn't be changed, the path does not exist or is not writeable");
                 }
                 break;
-            case "3"://closes submenu
+            case 3://closes submenu
                 System.out.println("Going back to main menu");
                 pathChangeRuns = false;
                 break;
@@ -246,5 +269,4 @@ public class CLI {
         System.out.println("Press enter to continue...");
         this.scanner.nextLine();
     }
-
 }

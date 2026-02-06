@@ -34,4 +34,12 @@ public class IOUtils {
 
         return false;
     }
+
+    public static Integer checkNumberInput(String number) throws NumberFormatException{
+        if (number.matches("\\d+")) {;
+            return Integer.parseInt(number);
+        } else {
+            return -1;
+        }
+    }
 }
