@@ -90,7 +90,7 @@ public class CLI {
             System.out.println("Which game version do you want to use to" + action.toUpperCase() + "?");
             printMenu("gameversion");
 
-            System.out.print(">");
+            System.out.print("> ");
             gameVersionOptions(scanner.nextLine().trim(), action);
 
             if (pickGameVersionRuns) {
@@ -171,12 +171,11 @@ public class CLI {
             choosenOptionInt = -1;
         }
 
-        System.out.println("The folder you choose has to contain the gamesave folder");
+        System.out.println("The folder you choose has to contain the savefile folder");
         System.out.println("eg: ../Documents/My Games/Binding of Isaac Rebirth/<your savefiles>");
         System.out.println("your path should be '../Documents/My games/'");
         
         System.out.println("Input the path you want to use for origin");
-        System.out.print(">");
 
         //todo: consider being more specific in errors when changing paths
         switch (choosenOptionInt) {
