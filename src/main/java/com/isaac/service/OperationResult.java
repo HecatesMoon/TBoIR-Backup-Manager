@@ -14,7 +14,7 @@ public class OperationResult {
         this.failedFiles = new ArrayList<>();
     }
 
-    public OperationResult (boolean success, String Message, ArrayList<String> failedFiles){
+    public OperationResult (boolean success, String Message, List<String> failedFiles){
         this.success = success;
         this.Message = Message;
         this.failedFiles = failedFiles;

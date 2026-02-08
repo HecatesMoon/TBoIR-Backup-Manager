@@ -1,7 +1,7 @@
 package com.isaac.ui;
 
 import java.util.Scanner;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 import com.isaac.Config;
 import com.isaac.service.GameVersion;
@@ -114,7 +114,7 @@ public class CLI {
 
 
         GameVersion[] versions = GameVersion.values();
-        Predicate<GameVersion> operation = (action.equals("backup")) ? saveManager::backup : restoreManager::restore;
+        Function<GameVersion, OperationResult> operation = (action.equals("backup")) ? saveManager::backup : restoreManager::restore;
 
         if (optionChoosenInt > 2 && optionChoosenInt <= versions.length+2){
                 executeOperation(versions[optionChoosenInt-3], operation, action);
@@ -128,6 +128,7 @@ public class CLI {
             case 2: //all tboi ver //todo: make a way to know which version are installed, like checking for folders on start
                 for (GameVersion v : versions){
                     executeOperation(v, operation, action);
+                    System.out.println();
                 }
                 pickGameVersionRuns = false;
                 break;
@@ -233,11 +234,19 @@ public class CLI {
         }
     }
 
-    private void executeOperation(GameVersion version, Predicate<GameVersion> task, String taskName){
-        if (task.test(version)){
-            System.out.println(version.getName() + " "+ taskName + " was succesful");
+    private void executeOperation(GameVersion version, Function<GameVersion, OperationResult> task, String taskName){
+        OperationResult result = task.apply(version);
+        if (result.getSuccess()){
+            System.out.println("Success: " + result.getMessage());
         } else {
             System.out.println("There was an error while trying to " + taskName + " " + version.getName() + " savefiles");
+            System.out.println(result.getMessage());
+            if (result.getFailedFiles().size() > 0) {
+                System.out.println("Files with problems:");
+                for (String fileMessage : result.getFailedFiles()) {
+                    System.out.println(fileMessage);
+                }
+            }
         }
     }
 

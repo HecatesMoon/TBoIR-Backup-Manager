@@ -3,6 +3,7 @@ package com.isaac.service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,7 +17,7 @@ public class SaveManager {
         this.config = config;
     }
 
-    public boolean backup(GameVersion version){
+    public OperationResult backup(GameVersion version){
 
         Path finalOriginPath = config.getOriginPath().resolve(config.ProtonUsageCheck(version));
 
@@ -24,8 +25,7 @@ public class SaveManager {
 
         //Validates if origin folder exists
         if (!Files.exists(finalOriginPath)){
-            System.err.println("Origin folder not found: " + finalOriginPath);
-            return false;
+            return new OperationResult(false, "Origin folder not found: " + finalOriginPath.toString());
         }
 
         //Validates if backup folder exists, if it doesn't, it creates it
@@ -34,8 +34,7 @@ public class SaveManager {
                 Files.createDirectories(finalBackupPath);
                 System.out.println("Directory created: " + finalBackupPath);
             } catch (IOException e) {
-                System.err.println("Failed creating backup directory: " + e.getMessage());
-                return false;
+                return new OperationResult(false, "Failed trying to create backup folder: " + e.getMessage());
             }
         }
 
@@ -43,24 +42,27 @@ public class SaveManager {
         try (Stream<Path> saveFiles = Files.walk(finalOriginPath, 2)) {
             List<Path> filesToCopy = saveFiles.filter(IOUtils::isTBoIFile).toList();
             System.out.println("Making a backup...");
+            List<String> failedFiles = new ArrayList<>();
             for(Path file:filesToCopy){
-                if (Files.isDirectory(file)){
-                    Path folderInBackup = finalBackupPath.resolve(file.getFileName());
-                    try {
+                try {
+                    if (Files.isDirectory(file)){
+                        Path folderInBackup = finalBackupPath.resolve(file.getFileName());
                         Files.createDirectories(folderInBackup);
-                    } catch (IOException e) {
-                        System.err.println("The backup couldn't end properly, please try again: " + e.getMessage());
-                        return false;
+                    } else if (Files.isRegularFile(file)){
+                        IOUtils.copyFile(finalOriginPath, file, finalBackupPath);
                     }
-                } else if (Files.isRegularFile(file)){
-                    IOUtils.copyFile( finalOriginPath, file, finalBackupPath);
+                } catch (IOException e) {
+                    failedFiles.add(file.toString() + " : " + e.getMessage());
                 }
             }
-            return true;
+            if (failedFiles.size() < 1){
+                return new OperationResult(true, "Backup finished successfully");
+            } else {
+                return new OperationResult(false, "Backup finished with some problems", failedFiles);
+            }
         } 
         catch (IOException e) {
-            System.err.println("Failed trying to copy files from origin: " + e.getMessage());
-            return false;
+            return new OperationResult(false, "Failed trying to copy fyles from origin: " + e.getMessage());
         }
     }
 }

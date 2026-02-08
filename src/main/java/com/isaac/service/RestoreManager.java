@@ -3,6 +3,7 @@ package com.isaac.service;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -16,7 +17,7 @@ public class RestoreManager {
         this.config = config;
     }
 
-    public boolean restore(GameVersion version){
+    public OperationResult restore(GameVersion version){
 
         Path finalOriginPath = config.getOriginPath().resolve(config.ProtonUsageCheck(version));
 
@@ -24,8 +25,7 @@ public class RestoreManager {
 
         //Validates if game folder inside the backup folder exists
         if (!Files.exists(finalBackupPath)){
-            System.err.println("Backup folder not found: " + finalBackupPath);
-            return false;
+            return new OperationResult(false, "Backup folder not found: " + finalBackupPath.toString());
         }
         //Validates if origin folder exists
         if (!Files.exists(finalOriginPath)){
@@ -35,32 +35,34 @@ public class RestoreManager {
                 Files.createDirectories(finalOriginPath);
                 System.out.println("Directory created: " + finalOriginPath);
             } catch (IOException e) {
-                System.err.println("Failed creating needed directory: " + e.getMessage());
-                return false;
+                return new OperationResult(false, "Failed trying to create inexistent origin folder: " + e.getMessage());
             }
         }
         //Copies each file from backup folder to origin folder
         try (Stream<Path> saveFiles = Files.walk(finalBackupPath,2)) {
             List<Path> filesToCopy = saveFiles.filter(IOUtils::isTBoIFile).toList();
             System.out.println("Restoring from backup...");
+            List<String> failedFiles = new ArrayList<>();
             for (Path file : filesToCopy) {
-                if (Files.isDirectory(file)){
-                    Path folderInOrigin = finalOriginPath.resolve(file.getFileName());
-                    try {
-                        Files.createDirectories(folderInOrigin);
-                    } catch (IOException e) {
-                        System.err.println("Restoring couldn't end properly, try again: " + e.getMessage());
-                        return false;
+                try {
+                    if (Files.isDirectory(file)){
+                        Path folderInOrigin = finalOriginPath.resolve(file.getFileName());
+                        Files.createDirectories(folderInOrigin); //todo: create folder method?
+                    } else if (Files.isRegularFile(file)){
+                        IOUtils.copyFile(finalBackupPath, file, finalOriginPath);
                     }
-                } else if (Files.isRegularFile(file)){
-                    IOUtils.copyFile(finalBackupPath, file, finalOriginPath);
+                } catch (IOException e) {
+                    failedFiles.add(file.toString() + " : " + e.getMessage());
                 }
             }
                      
-            return true;
+            if (failedFiles.size() < 1){
+                return new OperationResult(true, "Restore finished succesfully");
+            } else {
+                return new OperationResult(false, "Restore finished with some problems", failedFiles);
+            }
         } catch (IOException e) {
-            System.err.println("Failed trying to copy files from backup: " + e.getMessage());
-            return false;
+            return new OperationResult(false, "Failed trying to copy files from backup: " + e.getMessage());
         }
     }
 
