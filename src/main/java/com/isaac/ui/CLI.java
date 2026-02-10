@@ -78,7 +78,7 @@ public class CLI {
             case 5: // toggles steam cloud
                 pickGameVersionLoop("steamcloud");
             break;
-            case 6: // exits program
+            case 0: // exits program
                 System.out.println("Closing program");
                 cliLoopRuns = false;
                 break;
@@ -126,16 +126,14 @@ public class CLI {
 
         //TODO: CLEAN METHOD FROM INVASORS (STEAM CLOUD)
         
-        if (action.equals("steamcloud")){
-            if (optionChoosenInt < 0 || optionChoosenInt > 6){
-                System.out.println("Write a valid number");
-                return;
-            }
-        } else {
-            if (optionChoosenInt < 0 || optionChoosenInt > 7){
-                System.out.println("Write a valid number");
-                return;
-            }
+        int maxOption = GameVersion.values().length + 1;
+
+        if (action.equals("backup") || action.equals("restore")){
+            maxOption++;
+        }
+        if (optionChoosenInt < 0 || optionChoosenInt > maxOption){
+            System.out.println("Write a valid number");
+            return;
         }
 
         GameVersion[] versions = GameVersion.values();
@@ -149,24 +147,21 @@ public class CLI {
             operation = optionsManager::switchSteamCloud;
         }
 
-        if (optionChoosenInt == 1){
+        if (optionChoosenInt == 0){
             pickGameVersionRuns = false;
             return;
         }
-        if (optionChoosenInt == 2 && !action.equals("steamcloud")){
+        if (optionChoosenInt == 6 && !action.equals("steamcloud")){
             for (GameVersion v : versions){
                     executeOperation(v, operation, action);
                     System.out.println();
-                }
-                pickGameVersionRuns = false;
-                return;
-        }
-
-        if ((optionChoosenInt > 2) && (optionChoosenInt <= versions.length+2) && (!action.equals("steamcloud"))){
-            executeOperation(versions[optionChoosenInt-3], operation, action);
+            }
             pickGameVersionRuns = false;
-        } else if (optionChoosenInt <= versions.length && optionChoosenInt > 0 && action.equals("steamcloud")){
-            executeOperation(versions[optionChoosenInt-2], operation, action);
+            return;
+        }
+        if ((optionChoosenInt >= 1) && (optionChoosenInt <= versions.length)){
+            executeOperation(versions[optionChoosenInt-1], operation, action);
+            pickGameVersionRuns = false;
         }
     }
 
@@ -216,7 +211,7 @@ public class CLI {
             case 2:// changes backup path
                 showChangePathResult(config.setBackupPath(this.scanner.nextLine().trim()));
                 break;
-            case 3://closes submenu
+            case 0://closes submenu
                 System.out.println("Going back to main menu");
                 pathChangeRuns = false;
                 break;
@@ -236,39 +231,39 @@ public class CLI {
                 System.out.println("3. Restore the savefiles (from backup to source folder)");
                 System.out.println("4. Change Paths");
                 System.out.println("5. toggle steamcloud (choose game)");
-                System.out.println("6. Exit");
+                System.out.println("0. Exit");
                 System.out.println("What do you want to do? (press the number and then enter)");
                 break;
             case "paths":
                 System.out.println("----------MENU----------");
                 System.out.println("1. Change Origin Path");
                 System.out.println("2. Change Backup Path");
-                System.out.println("3. Exit Path Configuration");
+                System.out.println("0. Exit Path Configuration");
                 System.out.println("What do you want to do? (press the number and then enter)");
                 break;
             case "gameversion":
-                System.out.println("----------MENU----------");
-                System.out.println("1. Go back");
-                System.out.println("2. All of them"); //todo: check if folders exist in backup method
-                System.out.println("3. The Binding of Isaac Rebirth");
-                System.out.println("4. The Binding of Isaac Afterbirth");
-                System.out.println("5. The Binding of Isaac Afterbirth+");
+                System.out.println("----------MENU----------"); //todo: check if folders exist in backup method
+                System.out.println("1. The Binding of Isaac Rebirth");
+                System.out.println("2. The Binding of Isaac Afterbirth");
+                System.out.println("3. The Binding of Isaac Afterbirth+");
                 if (Config.isLinux || Config.isWindows){
-                System.out.println("6. The Binding of Isaac Repentance");
-                System.out.println("7. The Binding of Isaac Repentance+");
+                System.out.println("4. The Binding of Isaac Repentance");
+                System.out.println("5. The Binding of Isaac Repentance+");
                 }
+                System.out.println("6. All of them");
+                System.out.println("0. Go back");
                 System.out.println("What do you want to do? (press the number and then enter)");
                 break;
             case "steamcloud":
                 System.out.println("----------MENU----------");
-                System.out.println("1. Go back");
-                System.out.println("2. The Binding of Isaac Rebirth | " + showSteamCloudStatus(GameVersion.REBIRTH));
-                System.out.println("3. The Binding of Isaac Afterbirth| " + showSteamCloudStatus(GameVersion.AFTERBIRTH));
-                System.out.println("4. The Binding of Isaac Afterbirth+ | " + showSteamCloudStatus(GameVersion.AFTERBIRTH_PLUS));
+                System.out.println("1. The Binding of Isaac Rebirth | " + showSteamCloudStatus(GameVersion.REBIRTH));
+                System.out.println("2. The Binding of Isaac Afterbirth| " + showSteamCloudStatus(GameVersion.AFTERBIRTH));
+                System.out.println("3. The Binding of Isaac Afterbirth+ | " + showSteamCloudStatus(GameVersion.AFTERBIRTH_PLUS));
                 if (Config.isLinux || Config.isWindows){
-                System.out.println("5. The Binding of Isaac Repentance | " + showSteamCloudStatus(GameVersion.REPENTANCE));
-                System.out.println("6. The Binding of Isaac Repentance+ | " + showSteamCloudStatus(GameVersion.REPENTANCE_PLUS));
+                System.out.println("4. The Binding of Isaac Repentance | " + showSteamCloudStatus(GameVersion.REPENTANCE));
+                System.out.println("5. The Binding of Isaac Repentance+ | " + showSteamCloudStatus(GameVersion.REPENTANCE_PLUS));
                 }
+                System.out.println("0. Go back");
                 System.out.println("What do you want to do? (press the number and then enter)");
             default:
                 System.out.println("The menu you called doesn't exist.");
