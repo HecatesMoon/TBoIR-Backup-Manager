@@ -4,6 +4,7 @@ import java.util.Scanner;
 import java.util.function.Function;
 
 import com.isaac.Config;
+import com.isaac.service.Action;
 import com.isaac.service.GameVersion;
 import com.isaac.service.IOUtils;
 import com.isaac.service.OperationResult;
@@ -37,7 +38,7 @@ public class CLI {
         
         while (this.cliLoopRuns) {
             System.out.println("Welcome to TBoIR Backup Maker");
-            printMenu("main"); 
+            printMenu(Menu.MAIN); 
 
             System.out.print("> ");
             menuOption(this.scanner.nextLine().trim());
@@ -67,16 +68,16 @@ public class CLI {
                 System.out.println("Backup Path: " + config.getBackupPath().toString());
                 break;
             case 2: // backups data
-                pickGameVersionLoop("backup");
+                pickGameVersionLoop(Action.BACKUP);
                 break;
             case 3: // restores backup
-                pickGameVersionLoop("restore");
+                pickGameVersionLoop(Action.RESTORE);
                 break;
             case 4: // opens path configuration
                 pathChangeLoop();
                 break;
             case 5: // toggles steam cloud
-                pickGameVersionLoop("steamcloud");
+                pickGameVersionLoop(Action.TOGGLE_STEAMCLOUD);
             break;
             case 0: // exits program
                 System.out.println("Closing program");
@@ -88,18 +89,18 @@ public class CLI {
         }
     }
 
-    private void pickGameVersionLoop (String action){
+    private void pickGameVersionLoop (Action action){
         clearConsole();
         pickGameVersionRuns = true;
 
         while (pickGameVersionRuns) {
-            if (!action.equals("steamcloud")){
+            if (action != Action.TOGGLE_STEAMCLOUD){
                 System.out.println("-SELECT THE GAME VERSION-");
-                System.out.println("Which game version do you want to use to " + action.toUpperCase() + "?");
-                printMenu("gameversion");
+                System.out.println("Which game version do you want to use to " + action.getName() + "?");
+                printMenu(Menu.GAME_VERSION);
             } else {
                 System.out.println("Select the game to toggle SteamCloud in options.ini");
-                printMenu("steamcloud");
+                printMenu(Menu.STEAM_CLOUD_TOGGLE);
             }
 
             System.out.print("> ");
@@ -113,7 +114,7 @@ public class CLI {
 
     }
 
-    private void gameVersionOptions (String optionChoosen, String action){
+    private void gameVersionOptions (String optionChoosen, Action action){
         
         int optionChoosenInt;
 
@@ -128,7 +129,7 @@ public class CLI {
         
         int maxOption = GameVersion.values().length + 1;
 
-        if (action.equals("backup") || action.equals("restore")){
+        if (action == Action.BACKUP || action == Action.RESTORE){
             maxOption++;
         }
         if (optionChoosenInt < 0 || optionChoosenInt > maxOption){
@@ -139,11 +140,11 @@ public class CLI {
         GameVersion[] versions = GameVersion.values();
         Function<GameVersion, OperationResult> operation = v -> new OperationResult(true, "No action selected");
         
-        if (action.equals("backup")){
+        if (action == Action.BACKUP){
             operation = saveManager::backup;
-        } else if (action.equals("restore")) {
+        } else if (action == Action.RESTORE) {
             operation = restoreManager::restore;
-        } else if (action.equals("steamcloud")) {
+        } else if (action == Action.TOGGLE_STEAMCLOUD) {
             operation = optionsManager::switchSteamCloud;
         }
 
@@ -151,7 +152,7 @@ public class CLI {
             pickGameVersionRuns = false;
             return;
         }
-        if (optionChoosenInt == 6 && !action.equals("steamcloud")){
+        if (optionChoosenInt == 6 && action != Action.TOGGLE_STEAMCLOUD){
             for (GameVersion v : versions){
                     executeOperation(v, operation, action);
                     System.out.println();
@@ -174,7 +175,7 @@ public class CLI {
             System.out.println("------CHANGE PATHS------");
             System.out.println("Origin Path:" + config.getOriginPath());
             System.out.println("Backup Path:" + config.getBackupPath());
-            printMenu("paths");
+            printMenu(Menu.PATH_CHANGE);
 
             System.out.print("> ");
             changePath(this.scanner.nextLine().trim());
@@ -222,9 +223,9 @@ public class CLI {
 
     }
 
-    private void printMenu(String whichMenu){
-        switch (whichMenu) {
-            case "main":
+    private void printMenu(Menu menu){
+        switch (menu) {
+            case Menu.MAIN:
                 System.out.println("----------MENU----------");
                 System.out.println("1. Show current configured paths");
                 System.out.println("2. Backup the savefiles (from source to backup folder)");
@@ -234,14 +235,14 @@ public class CLI {
                 System.out.println("0. Exit");
                 System.out.println("What do you want to do? (press the number and then enter)");
                 break;
-            case "paths":
+            case Menu.PATH_CHANGE:
                 System.out.println("----------MENU----------");
                 System.out.println("1. Change Origin Path");
                 System.out.println("2. Change Backup Path");
                 System.out.println("0. Exit Path Configuration");
                 System.out.println("What do you want to do? (press the number and then enter)");
                 break;
-            case "gameversion":
+            case Menu.GAME_VERSION:
                 System.out.println("----------MENU----------"); //todo: check if folders exist in backup method
                 System.out.println("1. The Binding of Isaac Rebirth");
                 System.out.println("2. The Binding of Isaac Afterbirth");
@@ -254,7 +255,7 @@ public class CLI {
                 System.out.println("0. Go back");
                 System.out.println("What do you want to do? (press the number and then enter)");
                 break;
-            case "steamcloud":
+            case Menu.STEAM_CLOUD_TOGGLE:
                 System.out.println("----------MENU----------");
                 System.out.println("1. The Binding of Isaac Rebirth | " + showSteamCloudStatus(GameVersion.REBIRTH));
                 System.out.println("2. The Binding of Isaac Afterbirth| " + showSteamCloudStatus(GameVersion.AFTERBIRTH));
@@ -265,18 +266,19 @@ public class CLI {
                 }
                 System.out.println("0. Go back");
                 System.out.println("What do you want to do? (press the number and then enter)");
+                break;
             default:
-                System.out.println("The menu you called doesn't exist.");
+                System.out.println("Unkown menu option: " + menu.name());
                 break;
         }
     }
 
-    private void executeOperation(GameVersion version, Function<GameVersion, OperationResult> task, String taskName){
+    private void executeOperation(GameVersion version, Function<GameVersion, OperationResult> task, Action action){
         OperationResult result = task.apply(version);
         if (result.getSuccess()){
             System.out.println("Success: " + result.getMessage());
         } else {
-            System.out.println("There was an error while trying to " + taskName + " " + version.getName() + " savefiles");
+            System.out.println("There was an error while trying to " + action.getName() + " " + version.getName() + " savefiles");
             System.out.println(result.getMessage());
             if (result.getFailedFiles().size() > 0) {
                 System.out.println("Files with problems:");
