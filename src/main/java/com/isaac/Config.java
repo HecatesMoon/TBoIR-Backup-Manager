@@ -23,8 +23,8 @@ public class Config {
     public static final boolean isLinux = OS_NAME.toLowerCase().contains("linux");
     public static final boolean isMac = OS_NAME.toLowerCase().contains("mac");
 
-    private static final Path DEFAULT_ORIGIN_PATH = defaultOriginPath();
-    private static final Path DEFAULT_BACKUP_PATH = Path.of(BASE_DIR, "Isaac-Backups");
+    private static final Path DEFAULT_ORIGIN_PATH = defaultOriginPath().toAbsolutePath().normalize();
+    private static final Path DEFAULT_BACKUP_PATH = Path.of(BASE_DIR, "Isaac-Backups").toAbsolutePath().normalize();
     
     private Path ORIGIN_PATH;
     private Path BACKUP_PATH;
@@ -43,6 +43,18 @@ public class Config {
     private void loadProperties (){
         try (FileInputStream fis = new FileInputStream(CONFIG_FILE.toFile())){
             configs.load(fis);
+            Path originPathCheck = Path.of(configs.getProperty("ORIGIN_PATH"));
+            Path backupPathCheck = Path.of(configs.getProperty("BACKUP_PATH"));
+            
+            Path originResolved = resolveAbsoluteNormalizePath(originPathCheck);
+            Path backupResolved = resolveAbsoluteNormalizePath(backupPathCheck);
+
+            if (!originPathCheck.equals(originResolved) || !backupPathCheck.equals(backupResolved)){
+                configs.setProperty("ORIGIN_PATH", originResolved.toString());
+                configs.setProperty("BACKUP_PATH", backupResolved.toString());
+                storeProperties();
+            }
+            
         } catch (IOException e){
             System.err.println("Failed trying to read config.properties: " + e.getMessage());
             System.err.println("Loading defaults");
@@ -97,6 +109,17 @@ public class Config {
         configs.setProperty("BACKUP_PATH", DEFAULT_BACKUP_PATH.toString());
     }
 
+    private Path resolveAbsoluteNormalizePath(Path path){
+        Path pathCheck = path;
+            if (!path.isAbsolute()){
+                pathCheck = pathCheck.toAbsolutePath();
+            }
+            if (!pathCheck.equals(path.normalize())){
+                pathCheck = path.normalize();
+            }
+        return pathCheck;
+    }
+
     public OperationResult setOriginPath(String newOriginPath) {
 
         if (newOriginPath.isBlank()){
@@ -104,8 +127,9 @@ public class Config {
         }
 
         Path newPath = Path.of(newOriginPath);
+        newPath = resolveAbsoluteNormalizePath(newPath);
 
-        if (newPath.toAbsolutePath().normalize().equals(ORIGIN_PATH.toAbsolutePath().normalize())){
+        if (newPath.equals(ORIGIN_PATH)){
             return new OperationResult(false, "you are already using this path");
         }
 
@@ -117,7 +141,7 @@ public class Config {
         }
 
         ORIGIN_PATH = newPath;
-        configs.setProperty("ORIGIN_PATH", newOriginPath);
+        configs.setProperty("ORIGIN_PATH", newPath.toString());
         storeProperties();
         return new OperationResult(true, "origin path changed successfully");
     }
@@ -129,8 +153,9 @@ public class Config {
         }
         
         Path newPath = Path.of(newBackupPath);
+        newPath = resolveAbsoluteNormalizePath(newPath);
 
-        if (newPath.toAbsolutePath().normalize().equals(BACKUP_PATH.toAbsolutePath().normalize())){
+        if (newPath.equals(BACKUP_PATH)){
             return new OperationResult(false, "you are already using this path");
         }
 
@@ -142,7 +167,7 @@ public class Config {
         }
 
         BACKUP_PATH = newPath;
-        configs.setProperty("BACKUP_PATH", newBackupPath);
+        configs.setProperty("BACKUP_PATH", newPath.toString());
         storeProperties();
         return new OperationResult(true, "backup path changed successfully");
     }
@@ -163,6 +188,4 @@ public class Config {
             return gameFolder;
         }
     }
-
-    
 }
