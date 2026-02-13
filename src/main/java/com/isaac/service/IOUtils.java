@@ -7,6 +7,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class IOUtils {
 
@@ -33,6 +40,25 @@ public class IOUtils {
         }
 
         return false;
+    }
+
+    public static boolean fileWouldOverwrite (Path sourcePath, Path actualFile, Path targetPath){
+
+        Path resolvedFilePath = sourcePath.relativize(actualFile);
+        Path newFilePath = targetPath.resolve(resolvedFilePath);
+
+        if (Files.exists(newFilePath)){
+            return true;
+        } else {
+            return false;
+        }
+    } 
+
+    public static boolean wouldCauseOverwrite (List<Path> targetList, List<Path> sourceList, Path targetPath, Path sourcePath){
+        Function<Path, Path> newFilePath = p -> targetPath.resolve(sourcePath.relativize(p));
+        
+        return sourceList.stream().map(newFilePath)
+                         .anyMatch(targetList::contains);
     }
 
     public static Integer checkNumberInput(String number) throws NumberFormatException{

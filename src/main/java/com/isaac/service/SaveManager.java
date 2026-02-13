@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import com.isaac.Config;
@@ -64,5 +65,41 @@ public class SaveManager {
         catch (IOException e) {
             return new OperationResult(false, "Failed trying to copy fyles from origin: " + e.getMessage());
         }
+    }
+
+    public OperationResult isOverwriteDanger(GameVersion version){
+
+        Path finalOriginPath = config.getOriginPath().resolve(config.resolveProtonPath(version));
+        Path finalBackupPath = config.getBackupPath().resolve(version.getFolderName());
+        List<Path> backupList;
+        List<Path> originList;
+
+        if (!Files.exists(finalBackupPath)){
+            return new OperationResult(true, "there are no files to check in the backup folder");
+        }
+        if (!Files.exists(finalOriginPath)){
+            return new OperationResult(false, "Origin folder not found: " + finalOriginPath.toString());
+        }
+
+        try (
+            Stream<Path> backupStream = Files.walk(finalBackupPath).filter(IOUtils::isTBoIFile);
+            Stream<Path> originStream = Files.walk(finalOriginPath).filter(IOUtils::isTBoIFile);
+        ) {
+            backupList = backupStream.toList();
+            originList = originStream.toList();
+        } catch (IOException e) {
+            return new OperationResult(false, "couldn't access files to check if there are conflicting files");
+        }
+
+        if (IOUtils.wouldCauseOverwrite(backupList, originList, finalBackupPath, finalOriginPath)){
+            Predicate<Path> fileConflict = p -> IOUtils.fileWouldOverwrite(finalOriginPath, p, finalBackupPath);
+            List<String> overwriteRiskFiles = backupList.stream().filter(fileConflict).map(Path::toString).toList();
+            
+            return new OperationResult(false, "there are conflicting files", overwriteRiskFiles);
+        } else {
+            return new OperationResult(true, "there are no conflicting files");
+        }
+
+        
     }
 }
