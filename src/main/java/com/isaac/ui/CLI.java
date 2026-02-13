@@ -170,14 +170,13 @@ public class CLI {
         }
         //execute operation to selected game
         if ((optionChoosenInt >= 1) && (optionChoosenInt <= versions.length)){
-            if (action == Action.BACKUP || action == Action.RESTORE){
-                if (canOverwriteCheck(versions[optionChoosenInt-1], action)){
-                    executeOperation(versions[optionChoosenInt-1], operation, action);
-                }
-            } else {
+            if (action != Action.BACKUP && action != Action.RESTORE){
                 executeOperation(versions[optionChoosenInt-1], operation, action);
+                return;
             }
+            if (!canOverwriteCheck(versions[optionChoosenInt-1], action)) return;
 
+            executeOperation(versions[optionChoosenInt-1], operation, action);
             // pickGameVersionRuns = false;
             return;
         }
