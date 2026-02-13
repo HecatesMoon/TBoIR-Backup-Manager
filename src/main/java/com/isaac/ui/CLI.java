@@ -1,5 +1,6 @@
 package com.isaac.ui;
 
+import java.util.List;
 import java.util.Scanner;
 import java.util.function.Function;
 
@@ -169,8 +170,15 @@ public class CLI {
         }
         //execute operation to selected game
         if ((optionChoosenInt >= 1) && (optionChoosenInt <= versions.length)){
-            executeOperation(versions[optionChoosenInt-1], operation, action);
-            pickGameVersionRuns = false;
+            if (action == Action.BACKUP || action == Action.RESTORE){
+                if (canOverwriteCheck(versions[optionChoosenInt-1], action)){
+                    executeOperation(versions[optionChoosenInt-1], operation, action);
+                }
+            } else {
+                executeOperation(versions[optionChoosenInt-1], operation, action);
+            }
+
+            // pickGameVersionRuns = false;
             return;
         }
     }
@@ -267,7 +275,7 @@ public class CLI {
             case Menu.STEAM_CLOUD_TOGGLE:
                 System.out.println("----------MENU----------");
                 System.out.println("1. The Binding of Isaac Rebirth | " + showSteamCloudStatus(GameVersion.REBIRTH));
-                System.out.println("2. The Binding of Isaac Afterbirth| " + showSteamCloudStatus(GameVersion.AFTERBIRTH));
+                System.out.println("2. The Binding of Isaac Afterbirth | " + showSteamCloudStatus(GameVersion.AFTERBIRTH));
                 System.out.println("3. The Binding of Isaac Afterbirth+ | " + showSteamCloudStatus(GameVersion.AFTERBIRTH_PLUS));
                 if (Config.isLinux || Config.isWindows){
                 System.out.println("4. The Binding of Isaac Repentance | " + showSteamCloudStatus(GameVersion.REPENTANCE));
@@ -300,9 +308,69 @@ public class CLI {
 
     private void executeOperationForAll(Action action, Function<GameVersion, OperationResult> operation){
         for (GameVersion v : GameVersion.values()){
+            if (action == Action.BACKUP || action == Action.RESTORE){
+                if (canOverwriteCheck(v, action)){
                     executeOperation(v, operation, action);
-                    System.out.println();
+                }
+            } else {
+                executeOperation(v, operation, action);
             }
+            System.out.println();
+        }
+    }
+
+    private boolean canOverwriteCheck(GameVersion version, Action action){
+        if (action == Action.TOGGLE_STEAMCLOUD){
+            System.out.println("wrong action used, only use backup or restore");
+            return false;
+        }
+        OperationResult result = (action==Action.BACKUP) ? saveManager.isOverwriteDanger(version) : restoreManager.isOverwriteDanger(version) ;
+
+        if (!result.getSuccess() && result.getFailedFiles().size() > 0){
+            if (doYouOverwrite(result.getFailedFiles())){
+                System.out.println("Files will be overwritten");
+                return true;
+            } else {
+                System.out.println("Files will not be overwritten");
+                return false;
+            }
+        }
+        
+        if (!result.getSuccess()){
+            System.out.println(result.getMessage());
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private boolean doYouOverwrite(List<String> filesToOverwrite){
+        System.out.println("Do you want to overwrite the next files?");
+        for(String file : filesToOverwrite){
+            System.out.println(file);
+        }
+        System.out.println();
+
+        boolean questionLoop = true;
+        while (questionLoop){
+            System.out.println("do you want to overwrite them? (y/n):");
+            System.out.print(">");
+
+            String answer = scanner.nextLine().trim().toLowerCase();
+
+            if (answer.equals("y")){
+                questionLoop = false;
+                return true;
+            } else if (answer.equals("n")){
+                questionLoop = false;
+                return false;
+            } else {
+                System.out.println("write a valid option (y/n)");
+                continue;
+            }
+        }
+
+        return false;
     }
 
     private void showChangePathResult (OperationResult operation){
