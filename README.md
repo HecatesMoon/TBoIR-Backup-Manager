@@ -12,8 +12,9 @@ CLI backup manager that saves/restores game files across TBoI versions, with bat
 - Change backup filepaths from the program and persist them
 - Is compatible with mac, windows and linux
 
-![CLI Menu](screenshots/menu.png)
-![CLI_Backup](screenshots/backup.png)
+[<img src="screenshots/menu.png" width="400">](screenshots/menu.png)
+
+[<img src="screenshots/backup.png" width="620">](screenshots/backup.png)
 
 ## Requirements
 - Java 25 or higher
