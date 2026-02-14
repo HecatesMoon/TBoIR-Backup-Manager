@@ -331,6 +331,9 @@ public class CLI {
 
     private void executeOperationForAll(Action action, Function<GameVersion, OperationResult> operation){
         for (GameVersion v : GameVersion.values()){
+            if (Config.isMac && (v==GameVersion.REPENTANCE || v==GameVersion.REPENTANCE_PLUS)) continue;
+            if (action == Action.BACKUP && !config.isGameInOrigin.get(v)) continue;
+            if (action == Action.RESTORE && !config.isGameInBackup.get(v)) continue;
             if (action == Action.BACKUP || action == Action.RESTORE){
                 if (canOverwriteCheck(v, action)){
                     executeOperation(v, operation, action);
