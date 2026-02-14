@@ -38,7 +38,12 @@ public class CLI {
         clearConsole();
         
         while (this.cliLoopRuns) {
-            System.out.println("Welcome to TBoIR Backup Maker");
+            System.out.println("===============================");
+            System.out.println("Welcome to TBoIR Backup Manager");
+            if (!config.hasGameFolders()){
+                System.out.println("WARNING: Couldn't find any savegame folders in the set path");
+            }
+            System.out.println("===============================");
             printMenu(Menu.MAIN); 
 
             System.out.print("> ");

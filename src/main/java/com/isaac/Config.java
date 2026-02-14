@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
+import java.util.stream.Stream;
 
 import com.isaac.service.GameVersion;
 import com.isaac.service.OperationResult;
@@ -187,5 +188,36 @@ public class Config {
         } else {
             return gameFolder;
         }
+    }
+
+    public boolean hasGameFolders(){
+
+        boolean hasGameFolders;
+        
+        try (Stream<Path> files = Files.list(ORIGIN_PATH)) {
+            
+            hasGameFolders = files.anyMatch(this::matchAnyGameFolder);
+            
+            if (Config.isLinux && !hasGameFolders){
+                try (Stream<Path> filesProton = Files.list(ORIGIN_PATH.resolve(Path.of("Steam", "steamapps", "compatdata", "250900", "pfx", "drive_c", "users", "steamuser", "Documents", "My Games")));){
+                hasGameFolders = filesProton.anyMatch(this::matchAnyGameFolder);
+                }
+            }
+            
+        } catch (IOException e) {
+            return false;
+        }
+
+        return hasGameFolders;
+    }
+
+    private boolean matchAnyGameFolder(Path folderPath){
+        for(GameVersion name : GameVersion.values()){
+            if (name.getFolderName().getFileName()
+                                    .equals(folderPath.getFileName())){
+                return true;
+            }
+        }   
+        return false;
     }
 }
