@@ -1,9 +1,9 @@
-package com.isaac;
+package com.hecatesmoon.isaacbackupmanager;
 
-import com.isaac.service.OptionsManager;
-import com.isaac.service.RestoreManager;
-import com.isaac.service.SaveManager;
-import com.isaac.ui.CLI;
+import com.hecatesmoon.isaacbackupmanager.service.OptionsManager;
+import com.hecatesmoon.isaacbackupmanager.service.RestoreManager;
+import com.hecatesmoon.isaacbackupmanager.service.SaveManager;
+import com.hecatesmoon.isaacbackupmanager.ui.CLI;
 
 public class App {
     public static void main(String[] args) {

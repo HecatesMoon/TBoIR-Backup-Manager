@@ -1,18 +1,18 @@
-package com.isaac.ui;
+package com.hecatesmoon.isaacbackupmanager.ui;
 
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Function;
 
-import com.isaac.Config;
-import com.isaac.service.Action;
-import com.isaac.service.GameVersion;
-import com.isaac.service.IOUtils;
-import com.isaac.service.OperationResult;
-import com.isaac.service.OptionsManager;
-import com.isaac.service.RestoreManager;
-import com.isaac.service.SaveManager;
+import com.hecatesmoon.isaacbackupmanager.Config;
+import com.hecatesmoon.isaacbackupmanager.service.Action;
+import com.hecatesmoon.isaacbackupmanager.service.GameVersion;
+import com.hecatesmoon.isaacbackupmanager.service.IOUtils;
+import com.hecatesmoon.isaacbackupmanager.service.OperationResult;
+import com.hecatesmoon.isaacbackupmanager.service.OptionsManager;
+import com.hecatesmoon.isaacbackupmanager.service.RestoreManager;
+import com.hecatesmoon.isaacbackupmanager.service.SaveManager;
 
 public class CLI {
 

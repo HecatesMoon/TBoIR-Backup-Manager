@@ -1,4 +1,4 @@
-package com.isaac.service;
+package com.hecatesmoon.isaacbackupmanager.service;
 
 public enum Action {
     BACKUP("backup"),

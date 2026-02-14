@@ -1,4 +1,4 @@
-package com.isaac;
+package com.hecatesmoon.isaacbackupmanager;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -9,9 +9,9 @@ import java.util.EnumMap;
 import java.util.Properties;
 import java.util.stream.Stream;
 
-import com.isaac.service.Action;
-import com.isaac.service.GameVersion;
-import com.isaac.service.OperationResult;
+import com.hecatesmoon.isaacbackupmanager.service.Action;
+import com.hecatesmoon.isaacbackupmanager.service.GameVersion;
+import com.hecatesmoon.isaacbackupmanager.service.OperationResult;
 
 public class Config {
 

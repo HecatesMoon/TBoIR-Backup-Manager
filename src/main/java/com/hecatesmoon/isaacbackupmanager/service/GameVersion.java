@@ -1,8 +1,8 @@
-package com.isaac.service;
+package com.hecatesmoon.isaacbackupmanager.service;
 
 import java.nio.file.Path;
 
-import com.isaac.Config;
+import com.hecatesmoon.isaacbackupmanager.Config;
 
 public enum GameVersion {
     REBIRTH("Binding of Isaac Rebirth", "binding of isaac rebirth", "Binding of Isaac Rebirth"),

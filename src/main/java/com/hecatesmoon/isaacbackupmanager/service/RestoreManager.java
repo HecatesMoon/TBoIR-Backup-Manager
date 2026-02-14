@@ -1,4 +1,4 @@
-package com.isaac.service;
+package com.hecatesmoon.isaacbackupmanager.service;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import com.isaac.Config;
+import com.hecatesmoon.isaacbackupmanager.Config;
 
 public class RestoreManager {
 
