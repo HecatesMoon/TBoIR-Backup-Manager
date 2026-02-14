@@ -5,18 +5,18 @@ import java.util.List;
 
 public class OperationResult {
     private final boolean success;
-    private final String Message;
+    private final String message;
     private final List<String> failedFiles;
 
-    public OperationResult (boolean success, String Message){
+    public OperationResult (boolean success, String message){
         this.success = success;
-        this.Message = Message;
+        this.message = message;
         this.failedFiles = new ArrayList<>();
     }
 
-    public OperationResult (boolean success, String Message, List<String> failedFiles){
+    public OperationResult (boolean success, String message, List<String> failedFiles){
         this.success = success;
-        this.Message = Message;
+        this.message = message;
         this.failedFiles = failedFiles;
     }
 
@@ -25,7 +25,7 @@ public class OperationResult {
     }
 
     public String getMessage(){
-        return this.Message;
+        return this.message;
     }
 
     public List<String> getFailedFiles(){
