@@ -1,5 +1,6 @@
 package com.isaac.ui;
 
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -104,11 +105,7 @@ public class CLI {
             System.out.println("-SELECT THE GAME VERSION-");
             System.out.println("Which game version do you want to use to " + action.getName() + "?");
 
-            if (action == Action.TOGGLE_STEAMCLOUD){
-                printMenu(Menu.STEAM_CLOUD_TOGGLE);
-            } else {
-                printMenu(Menu.GAME_VERSION);
-            }
+            printMenu(Menu.GAME_VERSION, action);
 
             System.out.print("> ");
             gameVersionOptions(scanner.nextLine().trim(), action);
@@ -264,35 +261,57 @@ public class CLI {
                 System.out.println("What do you want to do? (press the number and then enter)");
                 break;
             case Menu.GAME_VERSION:
-                System.out.println("----------MENU----------"); //todo: check if folders exist in backup method
-                System.out.println("1. The Binding of Isaac Rebirth");
-                System.out.println("2. The Binding of Isaac Afterbirth");
-                System.out.println("3. The Binding of Isaac Afterbirth+");
-                if (Config.isLinux || Config.isWindows){
-                System.out.println("4. The Binding of Isaac Repentance");
-                System.out.println("5. The Binding of Isaac Repentance+");
-                }
-                System.out.println("6. All of them");
-                System.out.println("0. Go back");
-                System.out.println("What do you want to do? (press the number and then enter)");
-                break;
-            case Menu.STEAM_CLOUD_TOGGLE:
-                System.out.println("----------MENU----------");
-                System.out.println("1. The Binding of Isaac Rebirth | " + showSteamCloudStatus(GameVersion.REBIRTH));
-                System.out.println("2. The Binding of Isaac Afterbirth | " + showSteamCloudStatus(GameVersion.AFTERBIRTH));
-                System.out.println("3. The Binding of Isaac Afterbirth+ | " + showSteamCloudStatus(GameVersion.AFTERBIRTH_PLUS));
-                if (Config.isLinux || Config.isWindows){
-                System.out.println("4. The Binding of Isaac Repentance | " + showSteamCloudStatus(GameVersion.REPENTANCE));
-                System.out.println("5. The Binding of Isaac Repentance+ | " + showSteamCloudStatus(GameVersion.REPENTANCE_PLUS));
-                }
-                System.out.println("0. Go back");
-                System.out.println("What do you want to do? (press the number and then enter)");
+                System.out.println("Select an action in the function call");
                 break;
             default:
                 System.out.println("Unknown menu option: " + menu.name());
                 break;
         }
     }
+
+    public void printMenu(Menu menu, Action action){
+        switch (menu) {
+            case Menu.GAME_VERSION:
+                printGameOptions(action);
+                break;
+            default:
+                System.out.println("Unknown menu option: " + menu.name());
+                break;
+        }
+    }
+
+    private void printGameOptions(Action action) {
+
+        EnumMap<GameVersion, Boolean> folderToCheck = new EnumMap<>(GameVersion.class);
+        if (action == Action.BACKUP || action == Action.RESTORE){
+            folderToCheck = (action==Action.BACKUP) ? config.isGameInOrigin : config.isGameInBackup ;
+        }
+
+        System.out.println("----------MENU----------");
+
+        for (int i = 0; i < GameVersion.values().length ; i++){
+
+            if (Config.isMac && (i == GameVersion.REPENTANCE.ordinal() || i == GameVersion.REPENTANCE_PLUS.ordinal())) continue;
+
+            if (action == Action.BACKUP || action == Action.RESTORE){
+                if (folderToCheck.get(GameVersion.values()[i])){
+                    System.out.println(i+1 + ". " + GameVersion.values()[i].getName());
+                } else {
+                    System.out.println(i+1 + ". " + GameVersion.values()[i].getName() + " | (folder) not available");
+                }
+            } else if (action == Action.TOGGLE_STEAMCLOUD){
+                System.out.println(i+1 + ". " + GameVersion.values()[i].getName() + " | " + showSteamCloudStatus(GameVersion.values()[i]));
+            }
+            
+        }
+        if (action == Action.BACKUP || action == Action.RESTORE){
+            System.out.println("6. All of them");
+        }
+        System.out.println("0. Go back");
+        System.out.println("What do you want to do? (press the number and then enter)");
+    }
+
+    //TODO: make a map from option to actual action, only show available games 
 
     private void executeOperation(GameVersion version, Function<GameVersion, OperationResult> task, Action action){
         OperationResult result = task.apply(version);
