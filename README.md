@@ -18,6 +18,7 @@ CLI backup manager that saves/restores game files across TBoI versions, with bat
 
 ## Requirements
 - Java 25 or higher
+
 **Optional (for building a native-image):**
 - Maven (for compilation)
 - GraalVM (optional, for native-image)
