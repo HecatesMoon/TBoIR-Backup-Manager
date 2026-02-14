@@ -37,6 +37,10 @@ public class IOUtils {
         return false;
     }
 
+    public static boolean hasTBoIFiles (List<Path> files){
+        return files.stream().anyMatch(IOUtils::isTBoIFile);
+    }
+
     public static boolean fileWouldOverwrite (Path sourcePath, Path actualFile, Path targetPath){
 
         Path resolvedFilePath = sourcePath.relativize(actualFile);

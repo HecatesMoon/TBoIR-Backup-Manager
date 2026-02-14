@@ -42,6 +42,11 @@ public class RestoreManager {
         //Copies each file from backup folder to origin folder
         try (Stream<Path> saveFiles = Files.walk(finalBackupPath,2)) {
             List<Path> filesToCopy = saveFiles.filter(IOUtils::isTBoIFile).toList();
+
+            if (!IOUtils.hasTBoIFiles(filesToCopy)){
+                return new OperationResult(false, "This folder doesn't have any " + version.getName() + " savefiles: " + finalBackupPath);
+            }
+
             System.out.println("Restoring from backup...");
             List<String> failedFiles = new ArrayList<>();
             for (Path file : filesToCopy) {
@@ -100,7 +105,6 @@ public class RestoreManager {
             return new OperationResult(true, "there are no conflicting files");
         }
 
-        
     }
 
 }

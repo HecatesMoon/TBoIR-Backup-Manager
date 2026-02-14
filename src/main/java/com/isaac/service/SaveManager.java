@@ -42,6 +42,11 @@ public class SaveManager {
         //Copies each file from origin folder to the backup folder, applying filters
         try (Stream<Path> saveFiles = Files.walk(finalOriginPath, 2)) {
             List<Path> filesToCopy = saveFiles.filter(IOUtils::isTBoIFile).toList();
+
+            if (!IOUtils.hasTBoIFiles(filesToCopy)){
+                return new OperationResult(false, "This folder doesn't have any " + version.getName() + " savefiles: " + finalOriginPath);
+            }
+
             System.out.println("Making a backup...");
             List<String> failedFiles = new ArrayList<>();
             for(Path file:filesToCopy){
