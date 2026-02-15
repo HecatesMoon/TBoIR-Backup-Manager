@@ -22,6 +22,7 @@ CLI backup manager that saves/restores game files across TBoI versions, with bat
 **Optional (for building a native-image):**
 - Maven (for compilation)
 - GraalVM (optional, for native-image)
+
 **Optional (To compile it yourself):**
 - Java 25 or higher
 
@@ -32,6 +33,10 @@ CLI backup manager that saves/restores game files across TBoI versions, with bat
 2. Run it:
    - **Linux/macOS**: `chmod +x isaac-backup-manager-* && ./isaac-backup-manager-*`
    - **Windows**: Double-click the `.exe` file
+
+**💡 Recommended setup**: Use Google Drive Desktop (or Dropbox) and run the program from a folder synced to the cloud. This way your backups are automatically stored in the cloud.
+
+> **⚠️ Note**: When you run the program, it creates a `backups/` folder and a `config.properties` file in the **same directory where the program is located**.
 
 ### Build from source
 <details>
